@@ -28,10 +28,10 @@ module.exports = {
       },
     ],
     "@typescript-eslint/ban-types": "off",
-    "max-classes-per-file": ["error", 1],
     "sort-imports": "off",
     "lines-between-class-members": ["error", "always"],
     complexity: "off",
     "no-console": "warn",
+    "max-classes-per-file": "off",
   },
 };

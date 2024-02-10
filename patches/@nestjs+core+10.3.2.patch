@@ -1,0 +1,26 @@
+diff --git a/node_modules/@nestjs/core/helpers/external-context-creator.js b/node_modules/@nestjs/core/helpers/external-context-creator.js
+index e820c25..4c1b24f 100644
+--- a/node_modules/@nestjs/core/helpers/external-context-creator.js
++++ b/node_modules/@nestjs/core/helpers/external-context-creator.js
+@@ -133,16 +133,17 @@ class ExternalContextCreator {
+             const resolveParamValue = async (param) => {
+                 const { index, extractValue, type, data, metatype, pipes: paramPipes, } = param;
+                 const value = extractValue(...params);
+-                args[index] = await this.getParamValue(value, { metatype, type, data }, pipes.concat(paramPipes));
++                args[index] = (await this.getParamValue(value, { metatype, type, data }, pipes.concat(paramPipes))).value;
+             };
+             await Promise.all(paramsOptions.map(resolveParamValue));
+         };
+         return paramsOptions.length ? pipesFn : null;
+     }
+     async getParamValue(value, { metatype, type, data }, pipes) {
+-        return (0, shared_utils_1.isEmpty)(pipes)
+-            ? value
+-            : this.pipesConsumer.apply(value, { metatype, type, data }, pipes);
++        return {
++            value: (0, shared_utils_1.isEmpty)(pipes) ?  value :
++                this.pipesConsumer.apply(value, { metatype, type, data }, pipes)
++        };
+     }
+     async transformToResult(resultOrDeferred) {
+         if ((0, rxjs_1.isObservable)(resultOrDeferred)) {

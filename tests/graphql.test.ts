@@ -4,17 +4,32 @@ import {
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { Authenticated, CookieService, SecurityModule } from "../src";
-import { Controller, Get, Post, Res } from "@nestjs/common";
-import { FastifyReply } from "fastify";
+import { FastifyRequest, FastifyReply } from "fastify";
 import { sign } from "jsonwebtoken";
 import fastifyCookie from "@fastify/cookie";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  GraphQLModule,
+  ObjectType,
+  Field,
+  Context,
+} from "@nestjs/graphql";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
-@Controller()
-class TestController {
+@ObjectType()
+class Cat {
+  @Field(() => String)
+  hello: string;
+}
+
+@Resolver(() => Cat)
+class TestResolver {
   constructor(private readonly cookieService: CookieService) {}
 
-  @Post("/login")
-  async login(@Res({ passthrough: true }) response: FastifyReply) {
+  @Mutation(() => Boolean)
+  async login(@Context("res") res: FastifyReply) {
     const accessToken = sign(
       {
         tokenType: "dog",
@@ -23,10 +38,11 @@ class TestController {
       "secret",
     );
     const refreshToken = "refresh";
-    await this.cookieService.setCookies(response, accessToken, refreshToken);
+    await this.cookieService.setCookies(res, accessToken, refreshToken);
+    return true;
   }
 
-  @Get("/cats")
+  @Query(() => Cat)
   @Authenticated("dog")
   async cats() {
     return {
@@ -39,7 +55,15 @@ let app: NestFastifyApplication;
 
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({
+    providers: [TestResolver],
     imports: [
+      GraphQLModule.forRoot<ApolloDriverConfig>({
+        driver: ApolloDriver,
+        autoSchemaFile: true,
+        context: (req: FastifyRequest, res: FastifyReply) => {
+          return { req, res };
+        },
+      }),
       SecurityModule.forRoot({
         type: "cookie",
         accessTokenHeaderKey: "access_token",
@@ -50,7 +74,6 @@ beforeAll(async () => {
         refreshTokenHeaderKey: "refresh_token",
       }),
     ],
-    controllers: [TestController],
   }).compile();
 
   app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -71,9 +94,10 @@ beforeAll(async () => {
 it(`/GET cats`, async () => {
   const result = await app.inject({
     method: "POST",
-    url: "/login",
+    url: "/graphql",
+    body: { query: `mutation { login }` },
   });
-  expect(result.statusCode).toEqual(201);
+  expect(result.statusCode).toEqual(200);
   expect(result.cookies).toHaveLength(2);
 
   const cookies = result.cookies.reduce(
@@ -84,8 +108,9 @@ it(`/GET cats`, async () => {
     {} as { [k: string]: string },
   );
   const result2 = await app.inject({
-    method: "GET",
-    url: "/cats",
+    method: "POST",
+    url: "/graphql",
+    body: { query: `{ cats { hello } }` },
     cookies,
   });
   expect(result2.statusCode).toEqual(200);

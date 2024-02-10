@@ -12,7 +12,6 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,

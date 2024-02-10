@@ -39,11 +39,10 @@ export class CookieJwtStrategy
   ) {
     super();
     this.opaqueTokenExtractor = ExtractJwt.fromExtractors([
-      extractFromCookie(this.options.accessTokenHeaderKey),
-    ]);
-
-    this.accessTokenExtractor = ExtractJwt.fromExtractors([
       extractFromCookie(this.options.opaqueTokenHeaderKey),
+    ]);
+    this.accessTokenExtractor = ExtractJwt.fromExtractors([
+      extractFromCookie(this.options.accessTokenHeaderKey),
     ]);
   }
 

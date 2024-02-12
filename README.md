@@ -177,9 +177,9 @@ export class AppModule;
 Inside your resolvers you can access the request and response objects
 using the `@Context("req")` and `@Context("res")` decorators.
 
-> If you are using fastify, you cannot access the response using `@Context("res")
-due to a bug in `@nestjs/core`.
-Access it instead with `@Context() { res }: { res: FastifyReply }`.
+> If you are using fastify, you cannot access the response using `@Context("res")`
+> due to a bug in `@nestjs/core`.
+> Access it instead with `@Context() { res }: { res: FastifyReply }`.
 
 ## Getting the tokens inside a controller or resolver
 
@@ -214,7 +214,7 @@ import {
 } from "@moveaxlab/nestjs-security";
 
 @Authenticated("admin")
-@UseInterceptor(RefreshCookieInterceptor)
+@UseInterceptors(RefreshCookieInterceptor)
 class MyController {
   async myMethod(@RefreshToken() token: string) {
     // use the token here

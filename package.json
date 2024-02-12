@@ -19,8 +19,16 @@
     "type": "git",
     "directory": "https://github.com/moveaxlab/nestjs-security"
   },
-  "keywords": ["NestJS", "JWT", "Security"],
-  "files": ["lib", "esm", "types"],
+  "keywords": [
+    "NestJS",
+    "JWT",
+    "Security"
+  ],
+  "files": [
+    "lib",
+    "esm",
+    "types"
+  ],
   "scripts": {
     "build": "npm-run-all build:*",
     "build:cjs": "npm-run-all build:cjs:*",

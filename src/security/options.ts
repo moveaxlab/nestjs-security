@@ -16,9 +16,9 @@ export interface SecurityModuleCookieOptions {
   cookieDomain: string;
   secure?: boolean;
   tokenConverter?: <U>(token: unknown) => U;
-  accessTokenHeaderKey: string;
-  refreshTokenHeaderKey: string;
-  opaqueTokenHeaderKey: string;
+  accessTokenCookieName: string;
+  refreshTokenCookieName: string;
+  opaqueTokenCookieName: string;
 }
 
 export interface SecurityModuleHeaderOptions {

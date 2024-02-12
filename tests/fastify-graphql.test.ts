@@ -15,13 +15,18 @@ import {
   ObjectType,
   Field,
   Context,
+  ResolveField,
 } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { parseFastifyCookies } from "./utils";
 
 @ObjectType()
 class Cat {
   @Field(() => String)
   hello: string;
+
+  @Field(() => String)
+  name: string;
 }
 
 @Resolver(() => Cat)
@@ -42,12 +47,26 @@ class TestResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
+  async logout(
+    @Context("req") req: FastifyRequest,
+    @Context("res") res: FastifyReply,
+  ) {
+    await this.cookieService.clearCookies(req, res);
+  }
+
   @Query(() => Cat)
   @Authenticated("dog")
   async cats() {
     return {
       hello: "world",
     };
+  }
+
+  @ResolveField()
+  @Authenticated("dog")
+  async name() {
+    return "dog";
   }
 }
 
@@ -63,15 +82,16 @@ beforeAll(async () => {
         context: (req: FastifyRequest, res: FastifyReply) => {
           return { req, res };
         },
+        fieldResolverEnhancers: ["interceptors", "guards", "filters"],
       }),
       SecurityModule.forRoot({
         type: "cookie",
-        accessTokenHeaderKey: "access_token",
+        accessTokenCookieName: "access_token",
         cookieDomain: "localhost",
         cookieExpirationMilliseconds: 15 * 60 * 1000,
         jwtSecret: "secret",
-        opaqueTokenHeaderKey: "opaque_token",
-        refreshTokenHeaderKey: "refresh_token",
+        opaqueTokenCookieName: "opaque_token",
+        refreshTokenCookieName: "refresh_token",
       }),
     ],
   }).compile();
@@ -91,29 +111,35 @@ beforeAll(async () => {
   await app.getHttpAdapter().getInstance().ready();
 });
 
-it(`/GET cats`, async () => {
-  const result = await app.inject({
+it(`performs login, query, and logout`, async () => {
+  const loginResult = await app.inject({
     method: "POST",
     url: "/graphql",
     body: { query: `mutation { login }` },
   });
-  expect(result.statusCode).toEqual(200);
-  expect(result.cookies).toHaveLength(2);
+  expect(loginResult.statusCode).toEqual(200);
+  expect(loginResult.cookies).toHaveLength(2);
 
-  const cookies = result.cookies.reduce(
-    (acc, val) => {
-      acc[val.name] = val.value;
-      return acc;
-    },
-    {} as { [k: string]: string },
-  );
-  const result2 = await app.inject({
+  const cookies = parseFastifyCookies(loginResult.cookies);
+  const queryResult = await app.inject({
     method: "POST",
     url: "/graphql",
-    body: { query: `{ cats { hello } }` },
+    body: { query: `{ cats { hello name } }` },
     cookies,
   });
-  expect(result2.statusCode).toEqual(200);
+  expect(queryResult.statusCode).toEqual(200);
+
+  const logoutResult = await app.inject({
+    method: "POST",
+    url: "/graphql",
+    body: { query: `mutation { logout }` },
+    cookies,
+  });
+  expect(logoutResult.statusCode).toEqual(200);
+  expect(logoutResult.cookies).toHaveLength(3);
+  logoutResult.cookies.forEach((cookie) => {
+    expect(cookie.value).toEqual("");
+  });
 });
 
 afterAll(async () => {

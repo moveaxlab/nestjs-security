@@ -19,7 +19,7 @@ export class TokenTypeGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const user = getRequest(context).user;
 
-    if (!user) {
+    if (!user?.tokenType) {
       return false;
     }
 

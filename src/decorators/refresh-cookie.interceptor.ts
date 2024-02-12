@@ -24,7 +24,7 @@ export class RefreshCookieInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     const req = getRequest(context);
 
-    const refreshToken = req?.cookies[this.options.refreshTokenHeaderKey];
+    const refreshToken = req?.cookies?.[this.options.refreshTokenCookieName];
 
     if (!refreshToken) {
       throw new MissingRefreshTokenError();

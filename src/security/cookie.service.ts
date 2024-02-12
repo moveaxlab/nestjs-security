@@ -7,8 +7,8 @@ import moment from "moment";
 import { Redis } from "ioredis";
 import { randomUUID } from "crypto";
 import { SecurityModuleCookieOptions } from "./options";
-import { FastifyReply, FastifyRequest } from "fastify";
 import { ModuleRef } from "@nestjs/core";
+import { Request, Response } from "../utils/types";
 
 @Injectable()
 export class CookieService implements OnModuleInit {
@@ -29,7 +29,7 @@ export class CookieService implements OnModuleInit {
   }
 
   async setCookies(
-    response: FastifyReply,
+    response: Response,
     accessToken: string,
     refreshToken: string,
   ) {
@@ -52,28 +52,28 @@ export class CookieService implements OnModuleInit {
         `Storing access token ${accessToken} on redis with opaque token ${opaqueToken} for ${exp} seconds`,
       );
       await this.redis.setex(opaqueToken, exp, accessToken);
-      response.cookie(this.options.opaqueTokenHeaderKey, opaqueToken, options);
+      response.cookie(this.options.opaqueTokenCookieName, opaqueToken, options);
     } else {
-      response.cookie(this.options.accessTokenHeaderKey, accessToken, options);
+      response.cookie(this.options.accessTokenCookieName, accessToken, options);
     }
 
-    response.cookie(this.options.refreshTokenHeaderKey, refreshToken, options);
+    response.cookie(this.options.refreshTokenCookieName, refreshToken, options);
   }
 
-  async clearCookies(request: FastifyRequest, response: FastifyReply) {
+  async clearCookies(request: Request, response: Response) {
     const options = {
       domain: this.options.cookieDomain,
     };
 
-    const opaqueToken = request.cookies[this.options.opaqueTokenHeaderKey];
+    const opaqueToken = request.cookies?.[this.options.opaqueTokenCookieName];
 
     if (this.redis && opaqueToken) {
       this.logger.debug(`Deleting opaque token ${opaqueToken} from redis`);
       await this.redis.del(opaqueToken);
     }
 
-    response.clearCookie(this.options.accessTokenHeaderKey, options);
-    response.clearCookie(this.options.opaqueTokenHeaderKey, options);
-    response.clearCookie(this.options.refreshTokenHeaderKey, options);
+    response.clearCookie(this.options.accessTokenCookieName, options);
+    response.clearCookie(this.options.opaqueTokenCookieName, options);
+    response.clearCookie(this.options.refreshTokenCookieName, options);
   }
 }

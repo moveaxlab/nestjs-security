@@ -4,10 +4,11 @@ import {
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { Authenticated, CookieService, SecurityModule } from "../src";
-import { Controller, Get, Post, Res } from "@nestjs/common";
-import { FastifyReply } from "fastify";
+import { Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { sign } from "jsonwebtoken";
 import fastifyCookie from "@fastify/cookie";
+import { parseFastifyCookies } from "./utils";
 
 @Controller()
 class TestController {
@@ -33,6 +34,14 @@ class TestController {
       hello: "world",
     };
   }
+
+  @Post("/logout")
+  async logout(
+    @Req() request: FastifyRequest,
+    @Res({ passthrough: true }) response: FastifyReply,
+  ) {
+    await this.cookieService.clearCookies(request, response);
+  }
 }
 
 let app: NestFastifyApplication;
@@ -42,12 +51,12 @@ beforeAll(async () => {
     imports: [
       SecurityModule.forRoot({
         type: "cookie",
-        accessTokenHeaderKey: "access_token",
+        accessTokenCookieName: "access_token",
         cookieDomain: "localhost",
         cookieExpirationMilliseconds: 15 * 60 * 1000,
         jwtSecret: "secret",
-        opaqueTokenHeaderKey: "opaque_token",
-        refreshTokenHeaderKey: "refresh_token",
+        opaqueTokenCookieName: "opaque_token",
+        refreshTokenCookieName: "refresh_token",
       }),
     ],
     controllers: [TestController],
@@ -55,40 +64,40 @@ beforeAll(async () => {
 
   app = moduleRef.createNestApplication<NestFastifyApplication>(
     new FastifyAdapter(),
-    {
-      logger: ["verbose", "debug", "log", "warn", "error", "fatal"],
-    },
   );
 
-  await app.register(fastifyCookie, {
-    secret: "my-secret", // for cookies signature
-  });
+  await app.register(fastifyCookie);
 
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
 });
 
-it(`/GET cats`, async () => {
-  const result = await app.inject({
+it(`performs login, query, and logout`, async () => {
+  const loginResult = await app.inject({
     method: "POST",
     url: "/login",
   });
-  expect(result.statusCode).toEqual(201);
-  expect(result.cookies).toHaveLength(2);
+  expect(loginResult.statusCode).toEqual(201);
+  expect(loginResult.cookies).toHaveLength(2);
 
-  const cookies = result.cookies.reduce(
-    (acc, val) => {
-      acc[val.name] = val.value;
-      return acc;
-    },
-    {} as { [k: string]: string },
-  );
-  const result2 = await app.inject({
+  const cookies = parseFastifyCookies(loginResult.cookies);
+  const queryResult = await app.inject({
     method: "GET",
     url: "/cats",
     cookies,
   });
-  expect(result2.statusCode).toEqual(200);
+  expect(queryResult.statusCode).toEqual(200);
+
+  const logoutResult = await app.inject({
+    method: "POST",
+    url: "/logout",
+    cookies,
+  });
+  expect(logoutResult.statusCode).toEqual(201);
+  expect(logoutResult.cookies).toHaveLength(3);
+  logoutResult.cookies.forEach((cookie) => {
+    expect(cookie.value).toEqual("");
+  });
 });
 
 afterAll(async () => {

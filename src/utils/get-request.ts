@@ -1,6 +1,5 @@
-import { ExecutionContext } from "@nestjs/common";
-import { GqlContextType, GqlExecutionContext } from "@nestjs/graphql";
-import { ContextType, Request } from "./types";
+import { ExecutionContext, ContextType } from "@nestjs/common";
+import { Request } from "./types";
 
 /**
  * Extracts the request object from the execution context.
@@ -9,9 +8,10 @@ import { ContextType, Request } from "./types";
  * @param context the current execution context.
  */
 export function getRequest(context: ExecutionContext): Request {
-  switch (context.getType<GqlContextType>()) {
+  switch (context.getType<"graphql" | ContextType>()) {
     case "graphql":
-      return GqlExecutionContext.create(context).getContext<ContextType>().req;
+      // workaround to not rely on the graphql module directly
+      return context.getArgs()[2].req;
     case "http":
       return context.switchToHttp().getRequest();
     default:

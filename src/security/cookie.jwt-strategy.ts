@@ -8,14 +8,12 @@ import {
 } from "../constants";
 import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { SecurityModuleCookieOptions } from "./options";
-import { Request as ExtendedRequest, User } from "../utils/types";
+import { Request, User } from "../utils/types";
 import { ExtractJwt, JwtFromRequestFunction } from "passport-jwt";
-import { FastifyRequest } from "fastify";
-import "@fastify/cookie";
 import { ModuleRef } from "@nestjs/core";
 
 function extractFromCookie(cookie: string): JwtFromRequestFunction {
-  return (req: FastifyRequest) => req.cookies[cookie] ?? null;
+  return (req: Request) => req.cookies?.[cookie] ?? null;
 }
 
 @Injectable()
@@ -39,10 +37,10 @@ export class CookieJwtStrategy
   ) {
     super();
     this.opaqueTokenExtractor = ExtractJwt.fromExtractors([
-      extractFromCookie(this.options.opaqueTokenHeaderKey),
+      extractFromCookie(this.options.opaqueTokenCookieName),
     ]);
     this.accessTokenExtractor = ExtractJwt.fromExtractors([
-      extractFromCookie(this.options.accessTokenHeaderKey),
+      extractFromCookie(this.options.accessTokenCookieName),
     ]);
   }
 
@@ -52,7 +50,7 @@ export class CookieJwtStrategy
     }
   }
 
-  async validate<U extends User = User>(req: FastifyRequest): Promise<U> {
+  async validate<U extends User = User>(req: Request): Promise<U> {
     let token: string | null;
 
     const opaqueToken = this.opaqueTokenExtractor(req);
@@ -71,7 +69,7 @@ export class CookieJwtStrategy
       throw new Error("No auth token");
     }
 
-    (req as ExtendedRequest).token = token;
+    req.token = token;
 
     this.logger.debug(`Extracted access token ${token} from request`);
 

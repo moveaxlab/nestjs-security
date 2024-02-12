@@ -1,6 +1,6 @@
 # NestJS Security
 
-![NPM](https://img.shields.io/npm/l/%40moveaxlab%2Fnestjs-security)
+![NPM](https://img.shields.io/npm/l/@moveaxlab/nestjs-security)
 [![npm](https://img.shields.io/npm/v/@moveaxlab/nestjs-security)](https://www.npmjs.com/package/@moveaxlab/nestjs-security)
 
 This package contains security utilities for NestJS projects,

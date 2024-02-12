@@ -14,6 +14,13 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "homepage": "https://github.com/moveaxlab/nestjs-security",
+  "repository": {
+    "type": "git",
+    "directory": "https://github.com/moveaxlab/nestjs-security"
+  },
+  "keywords": ["NestJS", "JWT", "Security"],
+  "files": ["lib", "esm", "types"],
   "scripts": {
     "build": "npm-run-all build:*",
     "build:cjs": "npm-run-all build:cjs:*",

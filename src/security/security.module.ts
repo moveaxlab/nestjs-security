@@ -14,7 +14,6 @@ import {
   SecurityModuleOptions,
 } from "./options";
 import { CookieJwtStrategy } from "./cookie.jwt-strategy";
-import Redis from "ioredis";
 import { HeaderJwtStrategy } from "./header.jwt-strategy";
 
 export interface SecurityModuleCookieAsyncOptions {
@@ -88,8 +87,9 @@ export class SecurityModule {
         providers.push({
           provide: REDIS_INJECTION_KEY,
           inject: options.inject,
-          useFactory(...args: any[]) {
+          useFactory: async (...args: any[]) => {
             const config = options.useFactory(...args);
+            const { Redis } = await import("ioredis");
             return new Redis({
               connectionName: "security",
               keyPrefix: "security",

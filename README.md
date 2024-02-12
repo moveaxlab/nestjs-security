@@ -41,7 +41,8 @@ Remember to enable [cookie support](https://docs.nestjs.com/techniques/cookies) 
 When using cookies, you can replace the access token with an opaque token
 if your access token may be too big for HTTP headers.
 
-To enable the opaque token, configure the `redis` option.
+To enable the opaque token, install `ioredis` as a dependency,
+and configure the `redis` option.
 The access token will be stored on the configured redis server,
 and will be replaced in the cookies with a randomly generated token.
 

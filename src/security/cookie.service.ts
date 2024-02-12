@@ -4,7 +4,7 @@ import {
   SECURITY_CONFIG_INJECTION_KEY,
 } from "../constants";
 import moment from "moment";
-import { Redis } from "ioredis";
+import { Redis } from "./redis";
 import { randomUUID } from "crypto";
 import { SecurityModuleCookieOptions } from "./options";
 import { ModuleRef } from "@nestjs/core";

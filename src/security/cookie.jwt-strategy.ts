@@ -1,6 +1,6 @@
 import { Strategy } from "passport-custom";
 import { PassportStrategy } from "@nestjs/passport";
-import { Redis } from "ioredis";
+import { Redis } from "./redis";
 import { JwtService } from "@nestjs/jwt";
 import {
   REDIS_INJECTION_KEY,

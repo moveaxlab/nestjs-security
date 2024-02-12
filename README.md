@@ -1,5 +1,8 @@
 # NestJS Security
 
+![NPM](https://img.shields.io/npm/l/%40moveaxlab%2Fnestjs-security)
+[![npm](https://img.shields.io/npm/v/@moveaxlab/nestjs-security)](https://www.npmjs.com/package/@moveaxlab/nestjs-security)
+
 This package contains security utilities for NestJS projects,
 for both REST and GraphQL API gateways.
 It supports both express and fastify.

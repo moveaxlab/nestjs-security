@@ -1,6 +1,6 @@
 {
-  "name": "@moveax/nestjs-security",
-  "version": "1.0.0",
+  "name": "@moveaxlab/nestjs-security",
+  "version": "10.0.0",
   "description": "A NestJS library to handle JWT authentication for web and mobile apps.",
   "authors": [
     "Michelle Laurenti <michelle.laurenti@moveax.it>"
@@ -10,6 +10,10 @@
   "types": "./types/index.d.ts",
   "license": "MIT",
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "npm-run-all build:*",
     "build:cjs": "npm-run-all build:cjs:*",

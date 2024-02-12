@@ -34,7 +34,7 @@ class TestResolver {
   constructor(private readonly cookieService: CookieService) {}
 
   @Mutation(() => Boolean)
-  async login(@Context("res") res: FastifyReply) {
+  async login(@Context() { res }: { res: FastifyReply }) {
     const accessToken = sign(
       {
         tokenType: "dog",
@@ -50,7 +50,7 @@ class TestResolver {
   @Mutation(() => Boolean)
   async logout(
     @Context("req") req: FastifyRequest,
-    @Context("res") res: FastifyReply,
+    @Context() { res }: { res: FastifyReply },
   ) {
     await this.cookieService.clearCookies(req, res);
   }

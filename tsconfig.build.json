@@ -2,9 +2,10 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "module": "CommonJS",
+    "sourceMap": false,
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "outDir": "./lib",
     "rootDir": "./src",
     "declarationDir": "./types"

@@ -3,7 +3,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { Authenticated, CookieService, SecurityModule } from "../src";
+import { Authenticated, CookieService, HasPermission, SecurityModule } from "../src";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { sign } from "jsonwebtoken";
 import fastifyCookie from "@fastify/cookie";
@@ -27,6 +27,9 @@ class Cat {
 
   @Field(() => String)
   name: string;
+
+  @Field(() => String)
+  nickname: string;
 }
 
 @Resolver(() => Cat)
@@ -39,6 +42,9 @@ class TestResolver {
       {
         tokenType: "dog",
         uid: "corgi",
+        permissions: [
+          "nickname.read"
+        ]
       },
       "secret",
     );
@@ -67,6 +73,12 @@ class TestResolver {
   @Authenticated("dog")
   async name() {
     return "dog";
+  }
+
+  @ResolveField()
+  @HasPermission("nickname.read")
+  async nickname() {
+    return "fuffi";
   }
 }
 
@@ -124,7 +136,7 @@ it(`performs login, query, and logout`, async () => {
   const queryResult = await app.inject({
     method: "POST",
     url: "/graphql",
-    body: { query: `{ cats { hello name } }` },
+    body: { query: `{ cats { hello name nickname } }` },
     cookies,
   });
   expect(queryResult.statusCode).toEqual(200);

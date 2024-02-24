@@ -6,8 +6,8 @@ import {
   Dependencies,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { getRequest } from "../utils";
-import { TOKEN_TYPES_METADATA_KEY } from "../constants";
+import { getRequest } from "../../utils";
+import { TOKEN_TYPES_METADATA_KEY } from "../../constants";
 
 @Dependencies(Reflector)
 @Injectable()

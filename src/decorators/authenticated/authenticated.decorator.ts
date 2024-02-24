@@ -1,6 +1,6 @@
 import { applyDecorators, UseGuards } from "@nestjs/common";
 import { TokenTypes } from "./token-types.decorator";
-import { AuthGuard } from "./auth.guard";
+import { AuthGuard } from "../auth.guard";
 import { TokenTypeGuard } from "./token-type.guard";
 
 /**

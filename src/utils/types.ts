@@ -1,5 +1,6 @@
 export interface User {
   tokenType?: string;
+  permissions?: string[];
 }
 
 export interface Request<U extends User = User> {

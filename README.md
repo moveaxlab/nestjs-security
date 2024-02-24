@@ -79,6 +79,7 @@ The library assumes that all access tokens contain a `tokenType` field or a `per
 Authentication can be applied on the class level or on the method level.
 
 ### @Authenticated
+
 The library will check that the token type is equal with one of the roles declared in the decorator
 
 ```typescript
@@ -96,7 +97,9 @@ class MyController {
   }
 }
 ```
+
 ### @HasPermission
+
 The library will search for the required permission in the `permissions` array.
 
 ```typescript
@@ -118,9 +121,7 @@ class MyController {
 The library also accept the wildcard `*` has permission, to check that the user has a valid accessToken, but without any required permission.
 
 ```typescript
-import {
-  HasPermission,
-} from "@moveaxlab/nestjs-security";
+import { HasPermission } from "@moveaxlab/nestjs-security";
 
 @HasPermission("*")
 class MyController {
@@ -227,10 +228,10 @@ You can access the parsed access token and refresh token
 inside your controllers and resolvers using decorators.
 
 ```typescript
-import { 
-  Authenticated, 
+import {
+  Authenticated,
   AccessToken,
-  HasPermission
+  HasPermission,
 } from "@moveaxlab/nestjs-security";
 
 interface User {
@@ -247,7 +248,7 @@ class MyController {
   }
 }
 
-@HasPermission('myPermission')
+@HasPermission("myPermission")
 class MySecondController {
   async mySecondMethod(@AccessToken() token: User) {
     // use the token here

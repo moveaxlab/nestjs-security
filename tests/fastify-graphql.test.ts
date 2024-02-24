@@ -3,7 +3,12 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { Authenticated, CookieService, HasPermission, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { sign } from "jsonwebtoken";
 import fastifyCookie from "@fastify/cookie";
@@ -42,9 +47,7 @@ class TestResolver {
       {
         tokenType: "dog",
         uid: "corgi",
-        permissions: [
-          "nickname.read"
-        ]
+        permissions: ["nickname.read"],
       },
       "secret",
     );

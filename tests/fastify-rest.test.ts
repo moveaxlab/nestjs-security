@@ -3,7 +3,12 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { Authenticated, CookieService, HasPermission, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { sign } from "jsonwebtoken";
@@ -20,7 +25,7 @@ class TestController {
       {
         tokenType: "dog",
         uid: "corgi",
-        permissions: ['dogs.read']
+        permissions: ["dogs.read"],
       },
       "secret",
     );
@@ -37,7 +42,7 @@ class TestController {
   }
 
   @Get("/dogs")
-  @HasPermission('dogs.read')
+  @HasPermission("dogs.read")
   async dogs() {
     return {
       hello: "world",

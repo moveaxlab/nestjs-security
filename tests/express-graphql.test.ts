@@ -1,6 +1,11 @@
 import { Test } from "@nestjs/testing";
 import request from "supertest";
-import { Authenticated, CookieService, HasPermission, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { sign } from "jsonwebtoken";
 import {
   Resolver,
@@ -40,7 +45,7 @@ class TestResolver {
       {
         tokenType: "dog",
         uid: "corgi",
-        permissions: ['nickname.read']
+        permissions: ["nickname.read"],
       },
       "secret",
     );

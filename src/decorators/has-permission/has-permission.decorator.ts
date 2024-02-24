@@ -1,6 +1,6 @@
-import { applyDecorators, UseGuards } from '@nestjs/common';
-import { PermissionsGuard } from './permissions.guard';
-import { PermissionsTypes } from './permissions.types';
+import { applyDecorators, UseGuards } from "@nestjs/common";
+import { PermissionsGuard } from "./permissions.guard";
+import { PermissionsTypes } from "./permissions.types";
 import { AuthGuard } from "../auth.guard";
 
 /**
@@ -11,6 +11,6 @@ import { AuthGuard } from "../auth.guard";
 export function HasPermission(permission: string) {
   return applyDecorators(
     UseGuards(AuthGuard, PermissionsGuard),
-    PermissionsTypes(permission)
+    PermissionsTypes(permission),
   );
 }

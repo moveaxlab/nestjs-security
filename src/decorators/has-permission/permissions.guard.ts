@@ -4,8 +4,8 @@ import {
   Injectable,
   Logger,
   Dependencies,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import { getRequest } from "../../utils";
 import { PERMISSIONS_METADATA_KEY } from "../../constants";
 
@@ -25,10 +25,14 @@ export class PermissionsGuard implements CanActivate {
 
     const permission = (this.reflector.get(
       PERMISSIONS_METADATA_KEY,
-      context.getHandler()
-    ) || this.reflector.get(PERMISSIONS_METADATA_KEY, context.getClass())) as string;
+      context.getHandler(),
+    ) ||
+      this.reflector.get(
+        PERMISSIONS_METADATA_KEY,
+        context.getClass(),
+      )) as string;
     if (permission === "*") {
-      this.logger.debug('No specific permission required');
+      this.logger.debug("No specific permission required");
       return true;
     }
 

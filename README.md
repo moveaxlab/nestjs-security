@@ -74,9 +74,12 @@ custom transformations on the parsed access token.
 
 ## Authenticating users
 
-You can authenticate users based on their role (or token type).
-The library assumes that all access tokens contain a `tokenType` field.
+You can authenticate users based on their role (or token type) or based on the permission.
+The library assumes that all access tokens contain a `tokenType` field or a `permissions` array.
 Authentication can be applied on the class level or on the method level.
+
+### @Authenticated
+The library will check that the token type is equal with one of the roles declared in the decorator
 
 ```typescript
 import { Authenticated } from "@moveaxlab/nestjs-security";
@@ -90,6 +93,39 @@ class MyController {
   @Authenticated("admin")
   async secondMethod() {
     // only accessible to admins
+  }
+}
+```
+### @HasPermission
+The library will search for the required permission in the `permissions` array.
+
+```typescript
+import { HasPermission } from "@moveaxlab/nestjs-security";
+
+@HasPermission("myResource.read")
+class MyController {
+  async firstMethod() {
+    // accessible to both admins and users
+  }
+
+  @HasPermission("myResource.write")
+  async secondMethod() {
+    // only accessible to admins
+  }
+}
+```
+
+The library also accept the wildcard `*` has permission, to check that the user has a valid accessToken, but without any required permission.
+
+```typescript
+import {
+  HasPermission,
+} from "@moveaxlab/nestjs-security";
+
+@HasPermission("*")
+class MyController {
+  async getMyProfile() {
+    // use the token here
   }
 }
 ```
@@ -191,17 +227,29 @@ You can access the parsed access token and refresh token
 inside your controllers and resolvers using decorators.
 
 ```typescript
-import { Authenticated, AccessToken } from "@moveaxlab/nestjs-security";
+import { 
+  Authenticated, 
+  AccessToken,
+  HasPermission
+} from "@moveaxlab/nestjs-security";
 
 interface User {
   tokenType: "admin" | "user";
   uid: string;
+  permission: string[];
   // other information contained in the token
 }
 
 @Authenticated("admin")
 class MyController {
   async myMethod(@AccessToken() token: User) {
+    // use the token here
+  }
+}
+
+@HasPermission('myPermission')
+class MySecondController {
+  async mySecondMethod(@AccessToken() token: User) {
     // use the token here
   }
 }

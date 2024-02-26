@@ -26,12 +26,14 @@ export class TokenTypeGuard implements CanActivate {
     const allowedTokenTypes = (this.reflector.get(
       TOKEN_TYPES_METADATA_KEY,
       context.getHandler(),
-    ) ||
-      this.reflector.get(
-        TOKEN_TYPES_METADATA_KEY,
-        context.getClass(),
-      )) as string[];
+    ) || this.reflector.get(TOKEN_TYPES_METADATA_KEY, context.getClass())) as
+      | string[]
+      | undefined;
 
+    if (!allowedTokenTypes || allowedTokenTypes.length === 0) {
+      this.logger.debug(`No allowed token type specified, continue`);
+      return true;
+    }
     this.logger.debug(
       `Allowed token types are: [${allowedTokenTypes.join(", ")}]`,
     );

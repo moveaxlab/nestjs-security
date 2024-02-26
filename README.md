@@ -98,6 +98,20 @@ class MyController {
 }
 ```
 
+In order check that the user has a valid accessToken, but without any required permission or roles you can use the `@Authenticated` decorator without any tokenType.
+
+```typescript
+import { HasPermission } from "@moveaxlab/nestjs-security";
+import { Authenticated } from "./authenticated.decorator";
+
+@Authenticated()
+class MyController {
+  async getMyProfile() {
+    // only accessibile to authenticated user
+  }
+}
+```
+
 ### @HasPermission
 
 The library will search for the required permission in the `permissions` array.
@@ -108,25 +122,12 @@ import { HasPermission } from "@moveaxlab/nestjs-security";
 @HasPermission("myResource.read")
 class MyController {
   async firstMethod() {
-    // accessible to both admins and users
+    // accessible to token with permission myResource.read
   }
 
   @HasPermission("myResource.write")
   async secondMethod() {
-    // only accessible to admins
-  }
-}
-```
-
-The library also accept the wildcard `*` has permission, to check that the user has a valid accessToken, but without any required permission.
-
-```typescript
-import { HasPermission } from "@moveaxlab/nestjs-security";
-
-@HasPermission("*")
-class MyController {
-  async getMyProfile() {
-    // use the token here
+    // only accessible to token with the permissions myResourse.write
   }
 }
 ```

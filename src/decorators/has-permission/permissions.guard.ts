@@ -31,10 +31,6 @@ export class PermissionsGuard implements CanActivate {
         PERMISSIONS_METADATA_KEY,
         context.getClass(),
       )) as string;
-    if (permission === "*") {
-      this.logger.debug("No specific permission required");
-      return true;
-    }
 
     return user.permissions.includes(permission);
   }

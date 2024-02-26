@@ -225,33 +225,15 @@ using the `@Context("req")` and `@Context("res")` decorators.
 
 ## Getting the tokens inside a controller or resolver
 
-You can access the parsed access token and refresh token
+You can access the access token and refresh token
 inside your controllers and resolvers using decorators.
 
 ```typescript
-import {
-  Authenticated,
-  AccessToken,
-  HasPermission,
-} from "@moveaxlab/nestjs-security";
-
-interface User {
-  tokenType: "admin" | "user";
-  uid: string;
-  permission: string[];
-  // other information contained in the token
-}
+import { Authenticated, AccessToken } from "@moveaxlab/nestjs-security";
 
 @Authenticated("admin")
 class MyController {
-  async myMethod(@AccessToken() token: User) {
-    // use the token here
-  }
-}
-
-@HasPermission("myPermission")
-class MySecondController {
-  async mySecondMethod(@AccessToken() token: User) {
+  async myMethod(@AccessToken() token: string) {
     // use the token here
   }
 }
@@ -271,6 +253,33 @@ import {
 @UseInterceptors(RefreshCookieInterceptor)
 class MyController {
   async myMethod(@RefreshToken() token: string) {
+    // use the token here
+  }
+}
+```
+
+You can access the parsed access token using the `@User` decorator.
+
+```typescript
+import { Authenticated, HasPermission, User } from "@moveaxlab/nestjs-security";
+
+interface UserType {
+  tokenType: "admin" | "user";
+  uid: string;
+  permission: string[];
+  // other information contained in the token
+}
+
+@Authenticated("admin")
+class MyController {
+  async myMethod(@User() token: UserType) {
+    // use the token here
+  }
+}
+
+@HasPermission("myPermission")
+class MySecondController {
+  async mySecondMethod(@User() token: UserType) {
     // use the token here
   }
 }

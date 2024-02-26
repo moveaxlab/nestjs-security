@@ -1,6 +1,6 @@
 {
   "name": "@moveaxlab/nestjs-security",
-  "version": "10.0.0",
+  "version": "10.1.0",
   "description": "A NestJS library to handle JWT authentication for web and mobile apps.",
   "authors": [
     "Michelle Laurenti <michelle.laurenti@moveax.it>"

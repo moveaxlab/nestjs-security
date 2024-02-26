@@ -3,7 +3,12 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { Authenticated, CookieService, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { sign } from "jsonwebtoken";
@@ -20,6 +25,7 @@ class TestController {
       {
         tokenType: "dog",
         uid: "corgi",
+        permissions: ["dogs.read"],
       },
       "secret",
     );
@@ -30,6 +36,14 @@ class TestController {
   @Get("/cats")
   @Authenticated("dog")
   async cats() {
+    return {
+      hello: "world",
+    };
+  }
+
+  @Get("/dogs")
+  @HasPermission("dogs.read")
+  async dogs() {
     return {
       hello: "world",
     };
@@ -87,6 +101,13 @@ it(`performs login, query, and logout`, async () => {
     cookies,
   });
   expect(queryResult.statusCode).toEqual(200);
+
+  const queryResultDogs = await app.inject({
+    method: "GET",
+    url: "/dogs",
+    cookies,
+  });
+  expect(queryResultDogs.statusCode).toEqual(200);
 
   const logoutResult = await app.inject({
     method: "POST",

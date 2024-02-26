@@ -1,6 +1,11 @@
 import { Test } from "@nestjs/testing";
 import request from "supertest";
-import { Authenticated, CookieService, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { sign } from "jsonwebtoken";
 import { parseExpressCookies } from "./utils";
@@ -18,6 +23,7 @@ class TestController {
       {
         tokenType: "dog",
         uid: "corgi",
+        permissions: ["mouse.read"],
       },
       "secret",
     );
@@ -30,6 +36,14 @@ class TestController {
   async cats() {
     return {
       hello: "world",
+    };
+  }
+
+  @Get("/mouse")
+  @HasPermission("mouse.read")
+  async mouse() {
+    return {
+      hello: "squit",
     };
   }
 
@@ -76,6 +90,11 @@ it(`performs login, query, and logout`, async () => {
     .get("/cats")
     .set("Cookie", loginResult.get("Set-Cookie"));
   expect(queryResult.statusCode).toEqual(200);
+
+  const permissionQueryResult = await request(app.getHttpServer())
+    .get("/mouse")
+    .set("Cookie", loginResult.get("Set-Cookie"));
+  expect(permissionQueryResult.statusCode).toEqual(200);
 
   const logoutResult = await request(app.getHttpServer())
     .post("/logout")

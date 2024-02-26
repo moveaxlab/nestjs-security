@@ -1,6 +1,11 @@
 import { Test } from "@nestjs/testing";
 import request from "supertest";
-import { Authenticated, CookieService, SecurityModule } from "../src";
+import {
+  Authenticated,
+  CookieService,
+  HasPermission,
+  SecurityModule,
+} from "../src";
 import { sign } from "jsonwebtoken";
 import {
   Resolver,
@@ -25,6 +30,9 @@ class Cat {
 
   @Field(() => String)
   name: string;
+
+  @Field(() => String)
+  nickname: string;
 }
 
 @Resolver(() => Cat)
@@ -37,6 +45,7 @@ class TestResolver {
       {
         tokenType: "dog",
         uid: "corgi",
+        permissions: ["nickname.read"],
       },
       "secret",
     );
@@ -62,6 +71,12 @@ class TestResolver {
   @Authenticated("dog")
   async name() {
     return "dog";
+  }
+
+  @ResolveField()
+  @HasPermission("nickname.read")
+  async nickname() {
+    return "fuffi";
   }
 }
 
@@ -114,7 +129,7 @@ it(`performs login, query, and logout`, async () => {
     .post("/graphql")
     .set("Cookie", cookies)
     .send({
-      query: `{ cats { hello name } }`,
+      query: `{ cats { hello name nickname } }`,
     });
   expect(queryResult.statusCode).toEqual(200);
 

@@ -72,7 +72,10 @@ export class SecurityModule {
       },
     ];
 
-    const exports: DynamicModule["exports"] = [JwtVerificationService];
+    const exports: DynamicModule["exports"] = [
+      JwtVerificationService,
+      SECURITY_CONFIG_INJECTION_KEY,
+    ];
 
     if (options.imports) {
       imports.push(...options.imports);
